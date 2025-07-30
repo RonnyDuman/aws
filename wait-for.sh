@@ -1,11 +1,10 @@
 #!/bin/sh
-# wait-for.sh
 
 host="$1"
 shift
 cmd="$@"
 
-until nc -z "$host" 3306; do
+until command -v nc >/dev/null && nc -z "$host" 3306; do
   echo "Esperando a que MySQL ($host:3306) esté disponible..."
   sleep 2
 done
