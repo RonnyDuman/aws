@@ -1,13 +1,19 @@
 #!/bin/sh
 
-host="$1"
-shift
-cmd="$@"
+# Espera a que el host:puerto esté disponible antes de continuar
+# Uso: ./wait-for.sh host:port -- comando_a_ejecutar
 
-until command -v nc >/dev/null && nc -z "$host" 3306; do
-  echo "Esperando a que MySQL ($host:3306) esté disponible..."
+set -e
+
+hostport="$1"
+shift
+
+host="$(echo "$hostport" | cut -d: -f1)"
+port="$(echo "$hostport" | cut -d: -f2)"
+
+until nc -z "$host" "$port"; do
+  echo "Esperando a que $host:$port esté disponible..."
   sleep 2
 done
 
-echo "MySQL está listo, ejecutando comando..."
-exec $cmd
+exec "$@"
